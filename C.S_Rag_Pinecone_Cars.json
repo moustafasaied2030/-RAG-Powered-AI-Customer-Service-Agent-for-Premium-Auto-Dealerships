@@ -1,0 +1,426 @@
+{
+  "name": "C.S_Rag_Pinecone_Cars",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1XZZjrELVXmnU7Ei5wB2YEjhk_BR1-aOC",
+          "mode": "list",
+          "cachedResultName": "Maintenance and Customer Service Policy_Cars",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1XZZjrELVXmnU7Ei5wB2YEjhk_BR1-aOC"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        -144
+      ],
+      "id": "5036d2ac-2ab2-49f2-917c-6bd27ea647fa",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "pV2Lq0dCijQewgbC",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1tP1hzCCeeLQzYNU92PUtd8OfTevma_4E",
+          "mode": "list",
+          "cachedResultName": "Maintenance and Customer Service Policy.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1tP1hzCCeeLQzYNU92PUtd8OfTevma_4E/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1104,
+        -144
+      ],
+      "id": "4aa2a8b1-e901-4b46-81c6-9b14463332e1",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "pV2Lq0dCijQewgbC",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "cars",
+          "mode": "list",
+          "cachedResultName": "cars"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        -144
+      ],
+      "id": "f91223cf-3c21-493a-84f2-34437fcc454f",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "F7Ix2sRuRF0ODBTI",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        64
+      ],
+      "id": "b3cc5c16-2f10-4281-8f44-c76e622fb8e4",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XxAG2oCq32x32h78",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_name",
+                "value": "={{ $json.name }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -752,
+        64
+      ],
+      "id": "399edbef-6d6d-45bc-9a74-78f7ffa1e1a4",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -512,
+        -128
+      ],
+      "id": "b2a44369-57de-4fea-ac4e-06a4af6e089d",
+      "name": "Telegram Trigger",
+      "webhookId": "5faaf08a-780b-4973-a881-4cbe92185655",
+      "credentials": {
+        "telegramApi": {
+          "id": "5u9TEhTG4JYncSXs",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a highly professional and polite customer service representative for a premium auto service center in Egypt. You MUST reply in a formal, respectful Egyptian Arabic dialect (لهجة مصرية راقية واحترافية).\n\nTone Guidelines:\n\nAlways use respectful terms like \"يا فندم\" and \"حضرتك\".\n\nSTRICTLY AVOID casual street slang, overly familiar phrases (e.g., \"بص يا سيدي\", \"يا باشا\", \"معلش\"), and excessive emojis.\n\nYour tone should be corporate, trustworthy, patient, and strictly professional, as if speaking to a VIP client.\n\nOperational Rules:\n\nAct as a human expert.\n\nNEVER mention \"checking my data\", \"translating\", or \"using tools\". Just provide the accurate answer directly from your knowledge base."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -272,
+        -128
+      ],
+      "id": "d68e9123-261d-4b6c-beb5-277e7b1b3f12",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        64
+      ],
+      "id": "fb04e065-ab85-48e5-9d4a-61c78c4b6dfb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XxAG2oCq32x32h78",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.from.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -288,
+        64
+      ],
+      "id": "77f8d60e-1d85-43fb-91e4-68262169c7e7",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "use this before any answer inquiry",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "cars",
+          "mode": "list",
+          "cachedResultName": "cars"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -144,
+        112
+      ],
+      "id": "94c34d51-ee05-4dfc-8360-a60bc2abd36e",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "F7Ix2sRuRF0ODBTI",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        368
+      ],
+      "id": "5117d784-2240-41ec-9851-0254dd516985",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XxAG2oCq32x32h78",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        -144
+      ],
+      "id": "a657b9e1-11c2-4125-85ca-49ef90082fe5",
+      "name": "Send a text message",
+      "webhookId": "5bf4f50d-1e3f-41c9-a56c-0abddb9b8fc3",
+      "credentials": {
+        "telegramApi": {
+          "id": "5u9TEhTG4JYncSXs",
+          "name": "Telegram account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "delete",
+        "deleteMode": "all"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        80
+      ],
+      "id": "df1b26ec-f603-4c91-9fa6-751386e105e0",
+      "name": "Chat Memory Manager"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Chat Memory Manager": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9d8b551b-5bd0-4da8-8d83-f3a8f03904ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0e896c54ea1beb70830db9c8b6d2c5460592a8e5d8cde8ea3a452ec98a4affa0"
+  },
+  "nodeGroups": [],
+  "id": "6aFK8oKCfE5MNDor",
+  "tags": []
+}
