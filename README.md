@@ -1,7 +1,7 @@
 # 🚗 RAG-Powered AI Customer Service Agent for Premium Auto Dealerships
 
 This repository contains a complete **n8n** workflow designed to build a highly intelligent customer service assistant for an automotive service center. By leveraging Retrieval-Augmented Generation (RAG), the system autonomously reads operational policies and provides highly accurate, context-aware responses to clients via Telegram. 
-![Workflow Architecture](Work%20flow.jpg)
+![Workflow Architecture](workflow.jpg)
 ## 🌟 Core Features
 * **Automated Data Ingestion:** The system actively monitors a designated Google Drive folder. Whenever a new policy document (e.g.,"Maintenance and Customer Service Policy.pdf") is uploaded or updated, the system automatically fetches and processes it[cite: 1, 2].
 * **High-Precision Retrieval (RAG):** Integrates Pinecone vector database with Google Gemini embeddings to deeply understand the semantic meaning of the service policies and retrieve the exact rules before answering.
